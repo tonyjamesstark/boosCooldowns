@@ -8,3 +8,12 @@
 /.idea/
 /jar/target/
 /projectFilesBackup/.idea/workspace.xml
+/.claude
+/apache-maven*
+/PortableGit*
+/projectFilesBackup*
+/work
+/plugin/logs
+/HANGAR_DESCRIPTION.md
+/TESTING.md
+/test plugins

@@ -2,7 +2,7 @@ package com.coloredcarrot.mcapi.json;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import cz.boosik.boosCooldown.BoosCoolDown;
+import software.boos.boosCooldown.BoosCoolDown;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
 

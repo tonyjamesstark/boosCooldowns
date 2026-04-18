@@ -1,5 +1,28 @@
+# ------------------------------------------------------------------
+# Database configuration
+# ------------------------------------------------------------------
+# type: sqlite (default, embedded) or mysql / mariadb (shared between servers)
+# For sqlite the file is placed inside the plugin's data folder.
+# For mysql/mariadb the driver is downloaded automatically via plugin.yml
+# libraries loader. Either fill in host/port/database/username/password or
+# set jdbc-url directly.
+database:
+  type: sqlite
+  # host: localhost
+  # port: 3306
+  # database: boosCooldowns
+  # username: user
+  # password: secret
+  # jdbc-url: jdbc:mysql://localhost:3306/boosCooldowns?useSSL=false
+  pool-size: 4
+  connection-timeout-ms: 10000
+  # how long the in-memory cache trusts DB values before refreshing
+  cache-ttl-seconds: 30
+
 options:
   options:
+    #should debug logging be enabled?
+    debug: false
     #should the plugin be disabled for ops?
     disabled_for_ops: true
     #should warmups be enabled?
@@ -47,11 +70,45 @@ options:
     #should commands signs be enabled?
     command_signs: false
     #should syntax blocker (blocks usage of commands with syntax /pluginname:command) be enabled?
+    # With this on, "/minecraft:tp" is rejected outright. Players may find this
+    # annoying. Prefer setting it to false and letting apply_rules_to_prefixed_syntax
+    # rewrite namespaced commands to their bare form.
     syntax_blocker_enabled: true
     #should syntax blocker be disabled for ops?
     disable_syntax_blocker_for_ops: false
+    #when syntax_blocker_enabled is false, should plugin rules still apply to
+    #namespaced commands? true rewrites "/minecraft:tp" → "/tp" internally so
+    #cooldowns/limits/prices apply normally; false lets them pass through untouched
+    apply_rules_to_prefixed_syntax: true
     #should command confirmations (when command has price, xp price or itemcost) be enabled?
     command_confirmation: true
+    #if a warmup is cancelled, return already-paid money/items/points to the player
+    refund_on_warmup_cancel: false
+    #default locale fallback when a player has no locale override
+    default_locale: en
+    #persist every command decision into the command_audit DB table
+    audit_enabled: false
+    audit_retention_days: 30
+    # Multi-server drift detection (see `/bcd diff`).
+    # Empty = auto-derive from hostname:port. Set a stable label per server (e.g. "survival-1").
+    node_id: ""
+    # How often each node scans peers' config hashes. Only relevant when multiple
+    # Minecraft servers share the same MySQL/MariaDB.
+    config_sync_interval_seconds: 60
+  boss_bar:
+    #show a boss bar progress indicator during warmups
+    warmup: false
+    #color: BLUE, GREEN, PINK, PURPLE, RED, WHITE, YELLOW
+    color: BLUE
+    #style: PROGRESS, NOTCHED_6, NOTCHED_10, NOTCHED_12, NOTCHED_20
+    style: PROGRESS
+  action_bar:
+    #display warmup countdown in the player's action bar
+    warmup: false
+    #show cooldown notices as an action bar instead of chat
+    cooldown_on_attempt: false
+    #how often to refresh the action bar (20 ticks = 1 second)
+    update_interval_ticks: 10
   units:
     #time unit for seconds that will be shown in messages
     seconds: seconds
@@ -94,6 +151,9 @@ options:
     cannot_create_sign: '&6You are not allowed to create this kind of signs!&f'
     cannot_use_sign: '&6You are not allowed to use this sign!&f'
     invalid_command_syntax: '&6You are not allowed to use command syntax /<pluginname>:<command>!'
+    disabled_command: '&cCommand &e&command& &cis currently disabled.&f'
+    server_cooling_down: '&6Server-wide cooldown for&e &command& &6is active. Wait &e&seconds&&6.&f'
+    check_cooldown: '&6Command&e &command& &6is still on cooldown. It will be available again in&e &seconds& &unit&.&f'
     confirmation_message: '&6Would you like to use command&e &command& &6?'
     confirmation_price_of_command: '&6its price is&e &price& &6and you now have &e&balance&'
     confirmation_item_price_of_command: '&6its price is&e &itemprice& &itemname&'

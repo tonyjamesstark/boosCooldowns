@@ -1,9 +1,12 @@
 name: boosCooldowns
-main: cz.boosik.boosCooldown.BoosCoolDown
-version: 3.17.7
-api-version: 1.13
+main: software.boos.boosCooldown.BoosCoolDown
+version: 4.0.0
+api-version: "1.20"
 authors: [LordBoos (boosik)]
-softdepend: [Vault, PlayerPoints]
+softdepend: [Vault, PlayerPoints, PlaceholderAPI, WorldGuard]
+libraries:
+  - org.xerial:sqlite-jdbc:3.46.0.0
+  - com.mysql:mysql-connector-j:8.4.0
 description: >
              Shortcuts
 commands:
@@ -121,3 +124,51 @@ permissions:
     booscooldowns.check.cooldown:
         description: Player can use "/booscooldowns checkcooldown [command]" to check if a command is still on cooldown or not.
         default: true
+    booscooldowns.clearcooldowns:
+        description: Player can use "/booscooldowns clearcooldowns <player> [command]".
+        default: op
+    booscooldowns.clearuses:
+        description: Player can use "/booscooldowns clearuses <player> [command]".
+        default: op
+    booscooldowns.clearwarmups:
+        description: Player can use "/booscooldowns clearwarmups <player>".
+        default: op
+    booscooldowns.scheduleglobalreset:
+        description: Player can schedule global limit resets via "/booscooldowns scheduleglobalreset".
+        default: op
+    booscooldowns.nodisable:
+        description: Player can still use commands that were disabled via the 'disabled' config flag.
+        default: false
+    booscooldowns.noactionbar:
+        description: Player will not receive plugin action bar notifications.
+        default: false
+    booscooldowns.nobossbar:
+        description: Player will not see the warmup boss bar.
+        default: false
+    booscooldowns.info:
+        description: View another player's cooldown/limit/warmup state via /bcd info.
+        default: op
+    booscooldowns.grant:
+        description: Manually grant a cooldown to a player via /bcd grant.
+        default: op
+    booscooldowns.validate:
+        description: Run /bcd validate on the config.
+        default: op
+    booscooldowns.audit:
+        description: Read the command_audit log via /bcd audit.
+        default: op
+    booscooldowns.diff:
+        description: Compare this node's config hash with other nodes sharing the same DB.
+        default: op
+    booscooldowns.status:
+        description: Use /bcd status to see your own cooldowns/limits/warmups.
+        default: true
+    booscooldowns.status.others:
+        description: Use /bcd status on other players.
+        default: op
+    booscooldowns.clear.all:
+        description: Wipe all player state via /bcd clear all.
+        default: op
+    booscooldowns.rule.get:
+        description: Inspect effective rules via /bcd rule get.
+        default: op

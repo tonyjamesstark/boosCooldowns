@@ -1,7 +1,7 @@
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>cz.boosik</groupId>
+    <groupId>software.boos</groupId>
     <artifactId>boosCooldowns</artifactId>
     <version>${boosCooldowns.version}</version>
     <modules>
@@ -11,10 +11,10 @@
     <packaging>pom</packaging>
     <url>http://maven.apache.org</url>
     <properties>
-        <boosCooldowns.version>3.17.7</boosCooldowns.version>
+        <boosCooldowns.version>4.0.0</boosCooldowns.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <minecraft.version>1.21.5</minecraft.version>
+        <minecraft.version>1.21.8</minecraft.version>
         <bukkit.version>R0.1</bukkit.version>
     </properties>
     <pluginRepositories>
@@ -27,6 +27,18 @@
     </pluginRepositories>
 
     <repositories>
+        <repository>
+            <id>papermc</id>
+            <url>https://repo.papermc.io/repository/maven-public/</url>
+        </repository>
+        <repository>
+            <id>extendedclip</id>
+            <url>https://repo.extendedclip.com/content/repositories/placeholderapi/</url>
+        </repository>
+        <repository>
+            <id>sk89q</id>
+            <url>https://maven.enginehub.org/repo/</url>
+        </repository>
         <repository>
             <id>rosewood-repo</id>
             <url>https://repo.rosewooddev.io/repository/public</url>

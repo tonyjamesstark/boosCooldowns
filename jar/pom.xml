@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>boosCooldowns</artifactId>
-        <groupId>cz.boosik</groupId>
+        <groupId>software.boos</groupId>
         <relativePath>../pom.xml</relativePath>
         <version>${boosCooldowns.version}</version>
     </parent>
@@ -14,7 +14,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>cz.boosik</groupId>
+            <groupId>software.boos</groupId>
             <artifactId>plugin</artifactId>
             <version>${boosCooldowns.version}</version>
             <scope>compile</scope>

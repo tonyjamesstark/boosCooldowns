@@ -8,7 +8,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import cz.boosik.boosCooldown.BoosCoolDown;
+import software.boos.boosCooldown.BoosCoolDown;
 
 /**
  * Represents a hover action.

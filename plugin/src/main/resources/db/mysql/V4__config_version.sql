@@ -1,0 +1,5 @@
+CREATE TABLE IF NOT EXISTS config_version (
+    node_id VARCHAR(64) NOT NULL PRIMARY KEY,
+    content_hash VARCHAR(64) NOT NULL,
+    reloaded_at BIGINT NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

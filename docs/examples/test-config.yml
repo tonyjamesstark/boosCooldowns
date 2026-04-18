@@ -1,0 +1,142 @@
+# boosCooldowns — test configuration
+#
+# Drop this into plugins/boosCooldowns/config.yml (overwriting the default) and
+# run `/bcd reload`. Every feature group from TESTING.md is exercised below.
+# Comments reference the step in TESTING.md where the rule is used.
+
+database:
+  type: sqlite
+  cache-ttl-seconds: 30
+  # For multi-server tests, switch to:
+  # type: mysql
+  # host: localhost
+  # port: 3306
+  # database: boosCooldowns
+  # username: boos
+  # password: secret
+
+options:
+  options:
+    disabled_for_ops: false          # [3.x] see the plugin act as op
+    warmups_enabled: true
+    cooldowns_enabled: true
+    limits_enabled: true
+    prices_enabled: true
+    item_cost_enabled: true
+    xp_cost_enabled: true
+    player_points_prices_enabled: false
+    cancel_warmup_on_move: true
+    cancel_warmup_on_damage: true
+    cancel_warmup_on_sneak: true
+    cancel_warmup_on_gamemode_change: true
+    syntax_blocker_enabled: true
+    command_confirmation: true        # [3.6] dialog for priced/limited commands
+    refund_on_warmup_cancel: true     # [4.6] refund scenario
+    audit_enabled: true               # [4.12] /bcd audit
+    audit_retention_days: 7
+    node_id: "test-1"                 # [5.3] change per node
+    config_sync_interval_seconds: 30  # [5.3] drift detection interval
+    debug: false
+  action_bar:
+    warmup: true                      # [3.3] action bar during warmup
+    cooldown_on_attempt: false        # flip to true to test [4.18]
+    update_interval_ticks: 10
+  boss_bar:
+    warmup: true                      # [3.3]
+    color: BLUE
+    style: PROGRESS
+  units:
+    hours: hours
+    minutes: minutes
+    seconds: seconds
+
+commands:
+  groups:
+    default:
+      # [3.2] basic cooldown + custom message
+      /me:
+        cooldown: "10 seconds"
+        cooldown_message: "&cSlow down — &e&seconds& &7left."
+
+      # [3.3] warmup + sound + boss bar
+      /say:
+        cooldown: "5 seconds"
+        warmup: 3
+        warmup_sound: BLOCK_BEACON_AMBIENT
+        complete_sound: ENTITY_EXPERIENCE_ORB_PICKUP
+        warmup_particle: ENCHANT
+
+      # [3.4] disabled command
+      /seed:
+        disabled: true
+        disabled_message: "&c/seed is off on this test server."
+
+      # [3.5] usage limit with reset
+      /list:
+        limit: 3
+        limit_reset_delay: "1 minute"
+
+      # [4.2] progressive cooldown
+      /time:
+        cooldown: "30 seconds"
+        cooldown_multiplier: 2.0
+        cooldown_reset_after: "5 minutes"
+
+      # [4.1] server-wide cooldown
+      /tell:
+        server_cooldown: "20 seconds"
+        server_cooldown_message: "&6Server-wide tell is cooling down — &e&seconds& left."
+
+      # [4.3] per-world restriction — rule only fires in the nether
+      /help:
+        worlds: [world_nether]
+
+      # [4.5] money + xp price (needs Vault + EssentialsX)
+      /kit:
+        cooldown: "1 hour"
+        price: 100.0
+        xpcost: 2
+
+      # [4.6] refund scenario — combine price + warmup; move during warmup
+      /warp:
+        cooldown: "30 seconds"
+        warmup: 5
+        price: 50.0
+        warmup_message: "&7Teleporting in &e&seconds&&7..."
+
+      # [4.7] item cost with name match
+      /wand:
+        itemcost:
+          item: DIAMOND
+          count: 1
+          name: "Magic Wand"
+
+      # [4.14] WorldGuard region restriction (optional)
+      /spawn:
+        cooldown: "5 minutes"
+        regions: [spawn]
+
+    # [4.15] group inheritance — vip overrides /me cooldown only
+    vip:
+      _inherits: default
+      /me:
+        cooldown: "2 seconds"
+
+  aliases:
+    /ja: /me                          # [3.x alias smoke test]
+
+# [4.4] event-based reset — kill a zombie to wipe /time cooldown
+event_triggers:
+  - when: KILL
+    entity: ZOMBIE
+    reset_cooldown: /time
+    message: "&aYou killed a &e&entity&&a — &b&command&&a cooldown has been reset!"
+    sound: ENTITY_PLAYER_LEVELUP
+    broadcast: false        # true would announce to every online player
+
+  # Example of an advancement trigger with broadcast
+  # - when: ADVANCEMENT
+  #   advancement: story/mine_diamond
+  #   reset_cooldown: /reward
+  #   message: "&6&player& just mined their first diamond! &e/reward&6 is available to them."
+  #   broadcast: true

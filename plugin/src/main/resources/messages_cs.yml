@@ -1,0 +1,23 @@
+options:
+  messages:
+    cooling_down: '&6Po\u010dkej &e&seconds& &unit&&6, ne\u017e budes moci pou\u017e\u00edt p\u0159\u00edkaz &e&command&&6.&f'
+    warming_up: '&6Po\u010dkej &e&seconds& &unit&&6, ne\u017e se &e&command& &6p\u0159ipraven\u00fd.&f'
+    warmup_already_started: '&6Warm-up pro &e&command& &6u\u017e b\u011b\u017e\u00ed.&f'
+    warmup_cancelled_by_move: '&6Warm-up zru\u0161en - pohyb hr\u00e1\u010de.&f'
+    warmup_cancelled_by_damage: '&6Warm-up zru\u0161en - obdr\u017eeno po\u0161kozen\u00ed.&f'
+    warmup_cancelled_by_sneak: '&6Warm-up zru\u0161en - krad.&f'
+    warmup_cancelled_by_sprint: '&6Warm-up zru\u0161en - sprintov\u00e1n\u00ed.&f'
+    warmup_cancelled_by_gamemode_change: '&6Warm-up zru\u0161en - zm\u011bna re\u017eimu hry.&f'
+    limit_achieved: '&6P\u0159\u00edkaz ji\u017e nen\u00ed k dispozici - dosa\u017een\u00fd limit.&f'
+    check_cooldown: '&6P\u0159\u00edkaz &e&command& &6je st\u00e1le na cooldownu. Bude op\u011bt dostupn\u00fd za &e&seconds& &unit&.&f'
+    check_cooldown_ok: '&6P\u0159\u00edkaz &e&command& &6je k dispozici.'
+    disabled_command: '&cP\u0159\u00edkaz &e&command& &cje aktu\u00e1ln\u011b vypnut\u00fd.&f'
+    server_cooling_down: '&6Server-wide cooldown pro &e&command& &6je aktivn\u00ed. Po\u010dkej &e&seconds&&6.&f'
+    insufficient_funds: '&6Nem\u00e1\u0161 dostatek pen\u011bz!&e &command& &6stoj\u00ed &e%s &6ale m\u00e1\u0161 jen &e%s'
+    confirmation_message: '&6Chce\u0161 pou\u017e\u00edt p\u0159\u00edkaz&e &command&&6?'
+    confirmation_confirm_command_execution: 'Ano'
+    confirmation_cancel_command_execution: 'Ne'
+  units:
+    hours: hodin
+    minutes: minut
+    seconds: sekund
