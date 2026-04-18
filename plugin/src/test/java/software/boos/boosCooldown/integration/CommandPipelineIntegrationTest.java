@@ -165,6 +165,58 @@ class CommandPipelineIntegrationTest {
     }
 
     @Test
+    void limitSurvivesWhenPlayerIsBlockedByCooldown() {
+        configureCommand("/kit", "cooldown", "60 seconds");
+        configureCommand("/kit", "limit", 3);
+
+        PlayerMock player = addPlayer("Broke");
+
+        // Burn a use so the cooldown is set
+        PlayerCommandPreprocessEvent first = fireCommand(player, "/kit");
+        assertFalse(first.isCancelled());
+        waitForAsync();
+        int afterFirst = plugin.services().limitService().getRemainingUses(
+                player, plugin.services().commandDataFactory().build(player, "/kit", "/kit"));
+        assertEquals(2, afterFirst);
+        while (player.nextMessage() != null) { /* drain */ }
+
+        // Second attempt hits the cooldown — must NOT consume another use
+        PlayerCommandPreprocessEvent second = fireCommand(player, "/kit");
+        assertTrue(second.isCancelled());
+        waitForAsync();
+        int afterBlocked = plugin.services().limitService().getRemainingUses(
+                player, plugin.services().commandDataFactory().build(player, "/kit", "/kit"));
+        assertEquals(2, afterBlocked,
+                "Cooldown-blocked attempt must not decrement the limit counter");
+    }
+
+    @Test
+    void limitStaysIntactWhenWarmupAlreadyRunning() {
+        configureCommand("/kit", "warmup", 60);
+        configureCommand("/kit", "limit", 5);
+
+        PlayerMock player = addPlayer("Queue");
+
+        // Start the warmup — consumes one use
+        PlayerCommandPreprocessEvent first = fireCommand(player, "/kit");
+        assertTrue(first.isCancelled(), "warmup captures the event");
+        waitForAsync();
+        int afterStart = plugin.services().limitService().getRemainingUses(
+                player, plugin.services().commandDataFactory().build(player, "/kit", "/kit"));
+        assertEquals(4, afterStart);
+        while (player.nextMessage() != null) { /* drain */ }
+
+        // Try to start another one while the first is running
+        PlayerCommandPreprocessEvent second = fireCommand(player, "/kit");
+        assertTrue(second.isCancelled());
+        waitForAsync();
+        int afterReject = plugin.services().limitService().getRemainingUses(
+                player, plugin.services().commandDataFactory().build(player, "/kit", "/kit"));
+        assertEquals(4, afterReject,
+                "warmup_already_started path must not double-decrement the limit");
+    }
+
+    @Test
     void namespacedCommandGetsRewrittenAndTriggersCooldown() {
         // Admin disables the outright block but keeps rewrite on.
         plugin.pluginConfig().raw().set("options.options.syntax_blocker_enabled", false);

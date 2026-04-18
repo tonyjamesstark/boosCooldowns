@@ -41,6 +41,22 @@ public final class PriceService {
     }
 
     /**
+     * Check-only variant of {@link #chargeAll}: walks every applicable provider
+     * and reports the first shortage without mutating any balances. Used by the
+     * command pipeline to pre-flight affordability before consuming a usage
+     * counter so players never pay for a command they can't actually run.
+     */
+    public Result checkAffordable(Player player, CommandData data) {
+        List<EconomyProvider> applicable = applicableProviders(data);
+        for (EconomyProvider provider : applicable) {
+            if (!provider.hasEnough(player, data)) {
+                return Result.insufficient(provider, provider.describeShortage(player, data));
+            }
+        }
+        return Result.success(applicable);
+    }
+
+    /**
      * Best-effort refund — used when a warmup is cancelled and
      * {@code options.refund_on_warmup_cancel} is enabled.
      */

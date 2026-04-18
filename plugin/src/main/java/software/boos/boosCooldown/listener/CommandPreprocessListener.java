@@ -207,17 +207,46 @@ public final class CommandPreprocessListener implements Listener {
 
     private PipelineResult runLimitPriceWarmup(Player player, String raw,
                                                String configuredKey, CommandData data) {
-        if (config.isLimitsEnabled() && !player.hasPermission("booscooldowns.nolimit")
-                && !player.hasPermission("booscooldowns.nolimit." + raw.toLowerCase())) {
+        // ---------- Phase 1: check every precondition WITHOUT mutating state ----------
+
+        boolean limitApplies = config.isLimitsEnabled()
+                && !player.hasPermission("booscooldowns.nolimit")
+                && !player.hasPermission("booscooldowns.nolimit." + raw.toLowerCase());
+        if (limitApplies && data.hasLimit() && limits.getRemainingUses(player, data) <= 0) {
+            BoosChat.sendMessage(player, messages.limitAchieved().replace("&command&", raw));
+            return PipelineResult.BLOCKED;
+        }
+
+        PriceService.Result affordability = prices.checkAffordable(player, data);
+        if (!affordability.success()) {
+            BoosChat.sendMessage(player, affordability.failureReason());
+            return PipelineResult.BLOCKED;
+        }
+
+        boolean warmupApplies = config.isWarmupEnabled() && data.hasWarmup()
+                && !player.hasPermission("booscooldowns.nowarmup")
+                && !player.hasPermission("booscooldowns.nowarmup." + raw.toLowerCase());
+        if (warmupApplies && warmups.hasWarmup(player)) {
+            BoosChat.sendMessage(player, messages.warmupAlreadyStarted().replace("&command&", raw));
+            return PipelineResult.BLOCKED;
+        }
+
+        // ---------- Phase 2: commit mutations in a defined order ----------
+
+        if (limitApplies) {
+            // tryConsume may still race with shared_limit handling — if it
+            // somehow returns false here we fail closed without charging.
             if (!limits.tryConsume(player, data)) {
-                BoosChat.sendMessage(player, messages.limitAchieved()
-                        .replace("&command&", raw));
+                BoosChat.sendMessage(player, messages.limitAchieved().replace("&command&", raw));
                 return PipelineResult.BLOCKED;
             }
         }
 
         PriceService.Result pricing = prices.chargeAll(player, data);
         if (!pricing.success()) {
+            // Very unlikely: balance disappeared between check and charge.
+            // Refund anything we did manage to take, and bail out.
+            prices.refundAll(player, data, pricing.chargedProviders());
             BoosChat.sendMessage(player, pricing.failureReason());
             return PipelineResult.BLOCKED;
         }
@@ -225,14 +254,7 @@ public final class CommandPreprocessListener implements Listener {
             BoosChat.sendMessage(player, provider.describePayment(player, data));
         }
 
-        if (config.isWarmupEnabled() && data.hasWarmup()
-                && !player.hasPermission("booscooldowns.nowarmup")
-                && !player.hasPermission("booscooldowns.nowarmup." + raw.toLowerCase())) {
-            if (warmups.hasWarmup(player)) {
-                BoosChat.sendMessage(player, messages.warmupAlreadyStarted()
-                        .replace("&command&", raw));
-                return PipelineResult.BLOCKED;
-            }
+        if (warmupApplies) {
             BoosChat.sendMessage(player,
                     formatCooldown(messages.warmingUp(player, configuredKey), raw, data.warmupSeconds()));
             final String commandToRun = raw;
