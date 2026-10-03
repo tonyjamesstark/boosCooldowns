@@ -67,6 +67,16 @@ class AliasServiceTest {
     }
 
     @Test
+    void resolveWildcardDoesNotMatchLongerCommandSharingPrefix() {
+        Mockito.when(config.getAliases()).thenReturn(Set.of("/w *"));
+        Mockito.when(config.getAlias("/w *")).thenReturn("/msg $*");
+        AliasService service = new AliasService(config);
+        assertNull(service.resolve(player, "/warp spawn"));
+        assertNull(service.resolve(player, "/warps"));
+        assertEquals("/msg Alice hi", service.resolve(player, "/w Alice hi"));
+    }
+
+    @Test
     void resolveIgnoresMissingPositional() {
         Mockito.when(config.getAliases()).thenReturn(Set.of("/tell *"));
         Mockito.when(config.getAlias("/tell *")).thenReturn("/msg $1 $2");

@@ -33,7 +33,8 @@ public final class AliasService {
         for (String aliasKey : aliases) {
             if (!aliasKey.contains("*")) continue;
             String keyNormalized = aliasKey.toLowerCase();
-            String prefix = keyNormalized.substring(0, keyNormalized.indexOf('*')).trim();
+            // Keep the space before '*': "/w *" must not match "/warp" (3.x matched "/w .+").
+            String prefix = keyNormalized.substring(0, keyNormalized.indexOf('*'));
             if (lower.startsWith(prefix)) {
                 String remainder = rawCommand.substring(prefix.length()).trim();
                 String[] args = remainder.isEmpty() ? new String[0] : remainder.split("\\s+");
