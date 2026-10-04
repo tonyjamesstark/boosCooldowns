@@ -77,6 +77,25 @@ class AliasServiceTest {
     }
 
     @Test
+    void resolveRestArgsSkipsPositionalsTheTemplateUses() {
+        Mockito.when(config.getAliases()).thenReturn(Set.of("/ja *", "/tell *"));
+        Mockito.when(config.getAlias("/ja *")).thenReturn("/me $1 $2 $* $world $player");
+        Mockito.when(config.getAlias("/tell *")).thenReturn("/msg $1 $*");
+        AliasService service = new AliasService(config);
+        assertEquals("/me a b c d world Steve", service.resolve(player, "/ja a b c d"));
+        assertEquals("/msg Alice hi there", service.resolve(player, "/tell Alice hi there"));
+    }
+
+    @Test
+    void resolveLeavesPlaceholderTextInArgsAlone() {
+        Mockito.when(config.getAliases()).thenReturn(Set.of("/w *"));
+        Mockito.when(config.getAlias("/w *")).thenReturn("/msg $*");
+        AliasService service = new AliasService(config);
+        assertEquals("/msg Alice it costs $5", service.resolve(player, "/w Alice it costs $5"));
+        assertEquals("/msg Alice $1 $player $*", service.resolve(player, "/w Alice $1 $player $*"));
+    }
+
+    @Test
     void resolveIgnoresMissingPositional() {
         Mockito.when(config.getAliases()).thenReturn(Set.of("/tell *"));
         Mockito.when(config.getAlias("/tell *")).thenReturn("/msg $1 $2");
