@@ -31,7 +31,7 @@ import java.util.UUID;
 
 /**
  * Main command-intake pipeline. Replaces the legacy {@code BoosCoolDownListener}.
- * Ordered checks: exception → syntax blocker → alias → per-command data →
+ * Ordered checks: syntax blocker → alias → exception → per-command data →
  * disabled → server cooldown → limit → permission → price → warmup → cooldown.
  */
 public final class CommandPreprocessListener implements Listener {
@@ -93,11 +93,12 @@ public final class CommandPreprocessListener implements Listener {
         // confirmation/warmup follow-through (see finishCommand).
         if (bypassing.contains(player.getUniqueId())) return;
 
-        if (!isPluginOnForPlayer(player)) return;
+        // Aliases still apply to OPs and exempt players (as in 3.x); only the rules are skipped.
+        boolean on = isPluginOnForPlayer(player);
 
         // Namespace-prefixed form like "/minecraft:tp spawn".
         String stripped = stripNamespacePrefix(raw);
-        boolean wasPrefixed = !stripped.equals(raw);
+        boolean wasPrefixed = on && !stripped.equals(raw);
 
         if (wasPrefixed && config.isSyntaxBlockerEnabled() && isSyntaxBlockerOn(player)) {
             // Admin explicitly chose to deny namespaced commands outright.
@@ -119,6 +120,8 @@ public final class CommandPreprocessListener implements Listener {
             event.setMessage(resolvedAlias);
             raw = resolvedAlias;
         }
+
+        if (!on) return;
 
         if (player.hasPermission("booscooldowns.norestriction")) return;
 
