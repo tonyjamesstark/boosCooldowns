@@ -23,7 +23,7 @@ options:
   options:
     #should debug logging be enabled?
     debug: false
-    #should the plugin be disabled for ops?
+    #should the plugin be disabled for ops? (ops with booscooldowns.norestriction still get aliases)
     disabled_for_ops: true
     #should warmups be enabled?
     warmups_enabled: true
